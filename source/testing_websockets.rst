@@ -36,4 +36,4 @@ Example
 
 Inline variables, variables from CSV files can be used just like in an `HTTP scenario <testing_http.html>`_.
 
-The WebSocket engine does not support parsing and reusing responses yet.
+.. warning:: The WebSocket engine does not support parsing/reusing responses or looping yet.

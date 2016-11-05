@@ -4,7 +4,9 @@ Getting Started
 Installing Artillery
 ####################
 
-Artillery is written in `Node.js <http://nodejs.org/>`_ (but you don't need to know Node or JS to use it). Grab the appropriate package from `nodejs.org <https://nodejs.org/en/download/>`_ or install Node.js with your favorite package manager first. Note: Artillery requires Node.js 4 or higher (Node.js 6+ is recommended).
+Artillery is written in `Node.js <http://nodejs.org/>`_ (but you don't need to know Node or JS to use it). Grab the appropriate package from `nodejs.org <https://nodejs.org/en/download/>`_ or install Node.js with your favorite package manager first.
+
+.. note:: Artillery requires Node.js 4 or higher (Node.js 6+ is recommended).
 
 Once Node.js is installed, install Artillery with:
 ::
@@ -58,7 +60,7 @@ And run it with:
 As Artillery runs the test, it will print various stats to the terminal (request latency, response codes etc).
 
 What our test does
-##################
+==================
 
 In this script, we specify that we are testing a service running on ``https://artillery.io`` which will be talking to over HTTP. We define one *load phase*, which will last 60 seconds with 20 new *virtual users* (arriving every second (on average).
 
@@ -67,7 +69,7 @@ Then we define one possible scenario for every new virtual user to pick from, wh
 We also set an ``x-my-service-auth`` header to be sent with every request.
 
 Reading the output
-##################
+==================
 
 While Artillery is running, you will see something like this printed to the terminal:
 

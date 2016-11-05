@@ -1,15 +1,19 @@
 Debugging your scripts
-************
+**********************
 
 Artillery can be configured to print debug information as it's running by setting
 the ``DEBUG`` environment variable. For example:
 ::
+
   DEBUG=http artillery run my-script.yaml
 
 Or if you are on Windows:
 ::
+
   set DEBUG=http
   artillery run my-script.yaml
+
+.. note:: This functionality is powered by the `debug <https://www.npmjs.com/package/debug>`_ library from npm
 
 Debugging HTTP scenarios
 ########################
@@ -19,10 +23,6 @@ Set ``DEBUG`` to:
 - ``http`` - to print requests and any errors
 - ``http:response`` - to print responses
 - ``http:capture`` - to print capture and transform operations
-
-Multiple settings can be combined, for example:
-::
-  DEBUG=http,http:response artillery run my-script.yaml
 
 Debugging Socket.io scenarios
 #############################
@@ -61,10 +61,19 @@ one virtual user. For example:
 
 Tell Artillery to use the "debug" environment with:
 ::
+  
   artillery run -e debug my-script.yaml
 
 Logging everything
-##############
+##################
 
-You can print all debug information (including debug information from
-Artillery's dependencies) by setting ``DEBUG=*``
+Multiple settings can be combined, for example:
+::
+
+  DEBUG=http,http:response artillery run my-script.yaml
+
+Or...if you are feeling a little crazy, you can print all debug information (including debug information from
+Artillery's dependencies)""
+::
+
+  DEBUG=* artillery run my-script.yaml

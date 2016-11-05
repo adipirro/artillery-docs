@@ -17,8 +17,7 @@ The ``emit`` action supports the following attributes:
    - ``channel`` - the name of the channel where the response is received
    - ``data`` - the data to verify is in the response
 
-An example
-~~~~~~~~~~
+**Example:**
 ::
 
   {

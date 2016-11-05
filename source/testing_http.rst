@@ -1,27 +1,27 @@
 Testing HTTP
 ************
 
-Actions
-#######
+Request Objects
+###############
 
-Each object in the ``flow`` array contains one key representing the HTTP method (``get``, ``put``, ``post`` and ``delete`` are supported), and the value is an object describing the request, supporting the following keys:
+Each object in the ``flow`` array contains one key representing the HTTP method (``GET``, ``PUT``, ``POST`` and ``DELETE`` are supported), and the value is an object describing the request, supporting the following keys:
 
-- ``url`` - the request URL; it will be appended to the ``target`` but can be fully qualified also
-- ``json`` - a JSON object to be sent in the request body
+- ``url`` - the request URL; Either a URI appended to the ``target`` or a fully qualified URL
+- ``json`` - JSON object to be sent in the request body
 - ``body`` - arbitrary data to be sent in the request body
-- ``headers`` - a JSON object describing header key-value pairs
-- ``cookie`` - a JSON object describing cookie key-value pairs
+- ``headers`` - JSON object describing header key-value pairs
+- ``cookie`` - JSON object describing cookie key-value pairs
 - ``capture`` - use this to capture values from the response body of a request and store those in variables
 
 GET / POST / PUT / DELETE
-#########################
+=========================
 
-Send a GET request:
+Send a GET request
 ::
 
     {"get": {"url": "/test"}}
 
-POST some JSON:
+POST some JSON
 ::
 
     {"post":
@@ -31,7 +31,7 @@ POST some JSON:
       }
     }
 
-POST arbitrary data:
+POST arbitrary data
 ::
 
     {"post":
@@ -42,7 +42,7 @@ POST arbitrary data:
     }
 
 Set headers
-###########
+===========
 
 You can set headers like this:
 ::
@@ -56,13 +56,29 @@ You can set headers like this:
       }
     }
 
-Extract and reuse parts of a response (request chaining)
-########################################################
+Cookies
+=======
 
-You can parse responses and reuse those values in subsequent requests.
+Cookies are remembered and re-used by individual virtual users. Custom cookies can be specified with the ``cookie`` attribute in individual requests.
+::
+
+    {"get":
+      {
+        "url": "/pets/",
+        "cookie": {
+          "saved": "tapir,sloth"
+        }
+      }
+    }
+
+
+Capturing Values
+################
+
+You can parse responses for specific data and reuse those values in subsequent requests.
 
 Syntax
-~~~~~~
+======
 
 To tell Artillery to parse a response, add a ``capture`` attribute to any request spec like so:
 ::
@@ -101,7 +117,7 @@ Optionally, it can also contain a ``transform`` attribute, which should be a sni
 Where ``this`` refers to the *context* of the virtual user running the scenario, i.e. an object containing all currently defined variables, including the one that has just been extracted from the response.
 
 Capturing multiple values
-%%%%%%%%%%%%%%%%%%%%%%%%%
+=========================
 
 Multiple values can be captured with an array of capture specs, e.g.:
 
@@ -121,8 +137,8 @@ Multiple values can be captured with an array of capture specs, e.g.:
       }
     }
 
-An example
-~~~~~~~~~~
+Chaining Requests
+=================
 
 In the following example, we POST to ``/pets`` to create a new resource, capture part of the response (the id of the new resource) and store it in the variable ``id``. We then use that value in the subsequent request to load the resource and to check to see if the resource we get back looks right.
 ::
@@ -155,21 +171,6 @@ example above could also be rewritten as:
       {
         "url": "/pets/{{ $.id }}",
         "match": {"json": "$.name", "value": "{{ name }}"}
-      }
-    }
-
-Cookies
-#######
-
-Cookies are remembered and re-used by individual virtual users. Custom cookies can be specified with ``cookie`` attribute in individual requests.
-::
-
-    {"get":
-      {
-        "url": "/pets/",
-        "cookie": {
-          "saved": "tapir,sloth"
-        }
       }
     }
 
@@ -256,8 +257,8 @@ Then tell ``artillery`` to use the payload file:
 
     artillery run my_test.json -p pets.csv
 
-Loop through a number of requests
-#################################
+Loop through requests
+#####################
 
 You can use the ``loop`` construct to loop through a number of requests in a scenario. For example, each virtual user will send 100 ``GET`` requests to ``/`` with this scenario:
 ::
@@ -287,16 +288,16 @@ If count is omitted, the loop will run indefinitely.
 
 The current step of the loop is available inside a loop through the ``$loopCount`` variable (for example going from 1 too 100 in the example above).
 
-Advanced: writing custom logic in Javascript
-#################################
+**Advanced:** Custom JavaScript Logic
+#####################################
 
-The HTTP engine has support for "hooks", which allow for custom JS functions to be called at certain points during the execution of a scenario.
+The HTTP engine has support for "hooks", which allow custom JS functions to be called at certain points during the execution of a scenario.
 
 - ``beforeRequest`` - called before a request is sent; request parameters (URL, cookies, headers, body etc) can be customized here
 - ``afterResponse`` - called after a response has been received; the response can be inspected and custom variables can be set here
 
 Specifying a function to run
-~~~~~~~~~~~~~~~~~~
+============================
 
 ``beforeRequest`` and ``afterResponse`` hooks can be set in a request spec like this:
 ::
@@ -311,18 +312,24 @@ Specifying a function to run
 
 This tells Artillery to run the ``setJSONBody`` function before the request is made, and to run the ``logHeaders`` function after the response has been received.
 
-Specifying multiple functions
-~~~~~~~~~~~~~~~~~~
+Multiple functions
+==================
 
 An array of function names can be specified too, in which case the functions will be run one after another.
+::
 
-Setting scenario-level hooks
-~~~~~~~~~~~~~~~~~~~~~~
+  // ... a request in a scenario definition:
+  {"post":
+    {"url": "/some/route",
+      "beforeRequest": ["setJSONBody", "setCookies"],
+      "afterRequest": ["logHeaders", "emailPersonIDontLike"]
+    }
+  }
 
-Similarly, a scenario definition can have a ``beforeRequest``/``afterResponse`` attribute, which will make the functions specified run for every request in the scenario.
+.. note:: Similarly, a scenario definition can have a ``beforeRequest``/``afterResponse`` attribute, which will make the functions specified run for every request in the scenario.
 
 Loading custom JS code
-~~~~~~~~~~~~~~~~~~~~
+======================
 
 To tell Artillery to load your custom code, set ``config.processor`` to path to your JS file:
 ::
@@ -359,13 +366,14 @@ The JS file is expected to be a standard Node.js module:
   }
 
 Function signatures
-^^^^^^^^^^^^^^^^^^
+-------------------
 
 ``beforeRequest``
 +++++++++++++++++
 
 A function invoked in a ``beforeRequest`` hook should have the following signature:
 ::
+
   function myBeforeRequestHandler(requestParams, context, ee, next) {
   }
 
@@ -381,6 +389,7 @@ Where:
 
 A function invoked in an ``afterResponse`` hook should have the following signature:
 ::
+
   function myAfterResponseHandler(requestParams, reponse, context, ee, next) {
   }
 
@@ -391,5 +400,3 @@ Where:
 - ``context`` is the virtual user's context, ``context.vars`` is a dictionary containing all defined variables
 - ``ee`` is an event emitter that can be used to communicate with Artillery
 - ``next`` is the callback which must be called for the scenario to continue; it takes no arguments
-
-
